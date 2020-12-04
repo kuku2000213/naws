@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.ware.narang.community.entity.NMessChat;
 import com.ware.narang.community.entity.NMessRoom;
+import com.ware.narang.community.entity.NowChat;
 import com.ware.narang.community.service.NMessService;
 import com.ware.narang.security.entity.Users;
 import com.ware.narang.security.service.UsersService;
@@ -45,7 +46,7 @@ public class NMessController {
 		
 //		List<NMessRoomListMapping> nmessroomnamelist = nService.selectRoomList();
 		
-		//실제로직
+		//�떎�젣濡쒖쭅
 //		 List<NMessRoom> list = nService.selectList();
 //		 log.info("[ LOG ] ------> list : " + list);
 //		model.addAttribute("nmessroomnamelist", list);
@@ -59,7 +60,7 @@ public class NMessController {
 //			HttpSession session,
 //			Principal principal,
 //			Model model) throws Exception {
-//			//principal 현재유저정보
+//			//principal �쁽�옱�쑀���젙蹂�
 //		log.info("[ LOG ] NMessController/createRoom   " );
 //		log.info("[ LOG ] ------> nMessRoomName : " + nMessRoomName);
 //		
@@ -147,7 +148,7 @@ public class NMessController {
 		return nmrList;
 	}
 	
-	// 해당 메시지 정보보내기
+	// �빐�떦 硫붿떆吏� �젙蹂대낫�궡湲�
 	@RequestMapping(value = "/nMess/chatRoom", method = RequestMethod.GET)
 	public String chatRoom(@RequestParam(value = "chatroomno")String roomno, Model model
 			,Principal principal) {
@@ -171,8 +172,8 @@ public class NMessController {
 //		String[]mobNum = username.split("\"");
 //		String username2 = mobNum[3];
 		
-//		String welcome = username2 + " 님이 입장하셨습니다.";
-//		String welcome = username + " 님이 입장하셨습니다.";
+//		String welcome = username2 + " �떂�씠 �엯�옣�븯�뀲�뒿�땲�떎.";
+//		String welcome = username + " �떂�씠 �엯�옣�븯�뀲�뒿�땲�떎.";
 		
 //		log.info("[ LOG ] NMessController/shownmesschat  welcome : " + welcome);
 		
@@ -222,6 +223,33 @@ public class NMessController {
 		
 		return nmclist;
 		
+	}
+	
+	@MessageMapping("chattingnow")
+	@SendTo("/nmess/nowchat")
+	public NowChat nowChat(String info)throws Exception{
+		
+		NowChat nc = new NowChat();
+		
+		log.info("[ LOG ] NMessRoom/nowchat  info : " + info);
+		
+		String[]mobNum = info.split("\"");
+		String parseinfo = mobNum[3];
+		String senddata = null;
+		
+		if(parseinfo.equals("yes")) { 
+			senddata = "chattrue";
+			nc.setSenddata(senddata);
+			
+		}else {
+			senddata = "chatfalse";
+			nc.setSenddata(senddata);
+		}
+		
+		
+		log.info("[ LOG ] NMessRoom/nowchat  nc : " + nc);
+		
+		return nc;
 	}
 	
 //	@MessageMapping("chatsend")

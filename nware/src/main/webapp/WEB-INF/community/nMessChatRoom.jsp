@@ -21,6 +21,10 @@
 		<input id = "roomno" type = "text" value = "${roomno}" style = "display : none;">
 		<input id = "username" type = "text" value ="${username}" style = "display : block;">
 	</div>
+	<div id = "nowchat" style = "height : 40px; width : 300px; background-color : #1d1f20; margin:0 auto;">
+	
+	</div>
+	<br>
 	<div style = "width : 560px; margin : 0 auto; box-shadow : 0px 0px 30px 4px gray">
 		<div style = "width : 560px; height : 800px; margin: 0 auto; background-color : #1d1f20; overflow-y :scroll"
 		id = "chatForm">
@@ -32,6 +36,7 @@
 		</div>
 	</div>
 	<input type = "text" id = "wakeup" value = "wakeup" style = "display:none;">
+	
 	<script>
 	var stompClient = null;
 
@@ -51,6 +56,10 @@
 			});
 			stompClient.subscribe('/nmess/chatcon', function(){
 				console.log("======> chatcon subscribe");
+				});
+			stompClient.subscribe('/nmess/nowchat', function(ischatting){
+				console.log("======> nowchat.subscribed");
+				showischatting(ischatting);
 				});
 		});
 	}
@@ -101,6 +110,7 @@
 		$("#chatForm").scrollTop($("#chatForm")[0].scrollHeight);	
 		
 	}
+	
 	function showChat(chatlist, chatlistlength) {
 		$("#chatForm").empty();
 		console.log("챗 리스트 ======>" + chatlist);
@@ -129,6 +139,38 @@
 					
 		}
 		$("#chatForm").scrollTop($("#chatForm")[0].scrollHeight);
+	}
+
+	function showischatting(ischatting){
+		var parsevalue = JSON.parse(ischatting.body);
+		console.log("showischatting ======>" + parsevalue.senddata);
+		//console.log("showischatting ======>" + ischatting);
+		if(parsevalue.senddata == "chattrue"){
+			//$("#chatForm").append("<div style = 'position:fixed; display : block; background-color : red;'>누군가 채팅중..</div>"
+			$("#nowchat").append("<div style = ' font-size : 20pt; font-weight : 600; color : white;'>누군가 채팅중..</div>"
+			);	
+		}else{
+			//$("#nowchat").append("<div style = ' background-color : blue;'>누군가 안채팅중..</div>");
+		}
+		
+	}
+
+	function nowchatsend(realnull){
+		
+		var nowchatting;
+
+		if(realnull == "no"){
+			nowchatting = "yes";
+			data= {'chatnow': nowchatting};
+			stompClient.send("/chattingnow", {}, JSON.stringify(data));
+		}else{
+			nowchatting = "no";
+			data= {'chatnow': nowchatting};
+			stompClient.send("/chattingnow", {}, JSON.stringify(data));
+		}
+		
+		
+		
 	}
 
 	function wakeUp(){
@@ -169,6 +211,22 @@
 					$("textarea#chatvaluesend").val('');
 				}
 			})
+		
+		$("textarea#chatvaluesend").on("keyup", function(){
+
+			var isnull = $("textarea#chatvaluesend").val();
+			var realnull;
+			$("#nowchat").empty();
+
+			if(isnull == ""){
+				realnull = "yes";
+				nowchatsend(realnull);
+			}else{
+				realnull = "no";
+				nowchatsend(realnull);
+			}
+			
+		})
 		
 		
 	</script>
